@@ -22,13 +22,15 @@ function bench_quick {
     io=$( ( dd if=/dev/zero of=$test_file bs=64k count=16k conv=fdatasync && rm -f test_$$ ) 2>&1 | awk -F, '{io=$NF} END { print io}' )
     rm $test_file
 
-    echo "CPU model : $cname"
-    echo "Number of cores : $cores"
-    echo "CPU frequency : $freq MHz"
-    echo "Total amount of ram : $tram MB"
-    echo "Total amount of swap : $swap MB"
-    echo "System uptime : $up"
-    echo "I/O speed : $io"
+    cat <<INFO
+CPU model: $cname
+Number of cores: $cores
+CPU frequency: $freq MHz
+Total amount of RAM: $tram MB
+Total amount of swap: $swap MB
+System uptime: $up
+I/O speed: $io
+INFO
 }
 
 
@@ -70,7 +72,7 @@ function bench_downloads {
     bench_dl "Softlayer - San Jose CA" \
         http://speedtest.sjc01.softlayer.com/downloads/test100.zip
 
-    bench_dl "Softlwayer - Washing DC" \
+    bench_dl "Softlwayer - Washington DC" \
         http://speedtest.wdc01.softlayer.com/downloads/test100.zip
 }
 
@@ -79,9 +81,12 @@ function bench_downloads {
 function ensure_unixbench {
     [ -d UnixBench ] && return
 
-    local NAME=UnixBench5.1.3
-    wget http://byte-unixbench.googlecode.com/files/$NAME.tgz
-    tar xvfz $NAME.tgz
+    apt-get install build-essential
+    #apt-get install build-essential libx11-dev libgl1-mesa-dev libxext-dev
+
+    local filever=UnixBench5.1.3
+    wget http://byte-unixbench.googlecode.com/files/$filever.tgz
+    tar xvfz $filever.tgz
 }
 
 
@@ -89,11 +94,8 @@ function ensure_unixbench {
 function bench_unixbench {
     ensure_unixbench
 
-    ap-get install build-essential
-    #apt-get install build-essential libx11-dev libgl1-mesa-dev libxext-dev
-
-    # dont need graphics
     pushd UnixBench > /dev/null
+    # dont need graphics
     ./Run index
     popd > /dev/null
 }
@@ -101,7 +103,18 @@ function bench_unixbench {
 
 # Creates a 100MB file for download testing.
 function create_big_file {
+    echo -n Creating big file ...
     dd if=/dev/urandom of=bigfile bs=1024 count=102400
+    echo OK
+}
+
+
+function remove_temporary_files {
+    echo -n Removing temporary files ...
+    rm -f vpsbench__*
+    rm -f bigfile
+    rm -rf UnixBench*
+    echo OK
 }
 
 
@@ -115,7 +128,6 @@ Usage: vpsbench [OPTION...]
 -f Create 100M bigfile
 -x Remove temporary files
 -u Bench unixbench
-
 USAGE
 }
 
@@ -127,6 +139,8 @@ function main {
     test $do_downloads && bench_downloads
     test $do_unixbench && bench_unixbench
 }
+
+
 
 
 # Parse command line options
@@ -142,17 +156,11 @@ while getopts :adfxu opt; do
             ;;
 
         f)
-            echo -n Creating bigfile ...
             create_big_file
-            echo OK
             exit
             ;;
         x)
-            echo -n Removing temporary files ...
-            rm -f vpsbench__*
-            rm -f bigfile
-            rm -rf UnixBench*
-            echo OK
+            remove_temporary_files
             exit
             ;;
         u)

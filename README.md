@@ -2,7 +2,10 @@
 
 Benchmark VPS performance.
 
-A script to run simple and comprehensive benchmarks on CPU and IO performance.
+A script to run simple and comprehensive benchmarks on CPU and IO performance. Tested on:
+
+* Debian 6.0.6
+* Ubuntu 12.04 LTS
 
 
 ## Usage
