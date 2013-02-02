@@ -99,6 +99,12 @@ function bench_unixbench {
 }
 
 
+# Creates a 100MB file for download testing.
+function create_big_file {
+    dd if=/dev/urandom of=bigfile bs=1024 count=102400
+}
+
+
 # Display usage.
 function usage {
     cat <<USAGE
@@ -106,6 +112,8 @@ Usage: vpsbench [OPTION...]
 
 -a Bench all
 -d Bench downloads
+-f Create 100M bigfile
+-x Remove temporary files
 -u Bench unixbench
 
 USAGE
@@ -122,7 +130,7 @@ function main {
 
 
 # Parse command line options
-while getopts :adu opt; do
+while getopts :adfxu opt; do
     case "$opt" in
         a)
             do_downloads=true
@@ -133,10 +141,23 @@ while getopts :adu opt; do
             do_downloads=true
             ;;
 
+        f)
+            echo -n Creating bigfile ...
+            create_big_file
+            echo OK
+            exit
+            ;;
+        x)
+            echo -n Removing temporary files ...
+            rm -f vpsbench__*
+            rm -f bigfile
+            rm -rf UnixBench*
+            echo OK
+            exit
+            ;;
         u)
             do_unixbench=true
             ;;
-
         ?)
             usage
             exit 2
