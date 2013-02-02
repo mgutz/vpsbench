@@ -16,7 +16,7 @@ A script to run simple and comprehensive benchmarks on CPU and IO performance.
 
 Example
 
-    % vpsbench
+    $ bash <(wget -O - https://raw.github.com/mgutz/vpsbench/master/vpsbench)
 
     CPU model :  Intel(R) Core(TM) i7-3770 CPU @ 3.40GHz
     Number of cores : 4
