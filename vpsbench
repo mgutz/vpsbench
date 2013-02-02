@@ -1,0 +1,148 @@
+#!/bin/bash
+
+#==============================================================================
+# Copyright (c) 2013 Mario Gutierrez <mario@mgutz.com>
+#
+# Licensed under The MIT License
+#==============================================================================
+
+
+# Quick benchmark, always run
+function bench_quick {
+    # remove any left over test files
+    rm -f vpsbench__* > /dev/null
+
+    test_file=vpsbench__$$
+    cname=$( awk -F: '/model name/ {name=$2} END {print name}' /proc/cpuinfo )
+    cores=$( awk -F: '/model name/ {core++} END {print core}' /proc/cpuinfo )
+    freq=$( awk -F: ' /cpu MHz/ {freq=$2} END {print freq}' /proc/cpuinfo )
+    tram=$( free -m | awk 'NR==2 {print $2}' )
+    swap=$( free -m | awk 'NR==4 {print $2}' )
+    up=$(uptime|awk '{ $1=$2=$(NF-6)=$(NF-5)=$(NF-4)=$(NF-3)=$(NF-2)=$(NF-1)=$NF=""; print }')
+    io=$( ( dd if=/dev/zero of=$test_file bs=64k count=16k conv=fdatasync && rm -f test_$$ ) 2>&1 | awk -F, '{io=$NF} END { print io}' )
+    rm $test_file
+
+    echo "CPU model : $cname"
+    echo "Number of cores : $cores"
+    echo "CPU frequency : $freq MHz"
+    echo "Total amount of ram : $tram MB"
+    echo "Total amount of swap : $swap MB"
+    echo "System uptime : $up"
+    echo "I/O speed : $io"
+}
+
+
+# Bench a single download file.
+function bench_dl {
+    echo -n "Downloading from $1 ... "
+    wget -O /dev/null "$2" 2>&1 | awk '/\/dev\/null/ {speed=$3 $4} END {gsub(/\(|\)/,"",speed); print speed}'
+}
+
+
+# Bench downloads from various places in the world.
+function bench_downloads {
+    echo
+
+    bench_dl "CacheFly" \
+        http://cachefly.cachefly.net/100mb.test
+
+    bench_dl "Linode - Atlanta GA" \
+        http://atlanta1.linode.com/100MB-atlanta.bin
+
+    bench_dl "Linode - Dallas TX" \
+        http://dallas1.linode.com/100MB-dallas.bin
+
+    bench_dl "Linode - Tokyo JP" \
+        http://tokyo1.linode.com/100MB-tokyo.bin
+
+    bench_dl "Linode - London UK" \
+        http://speedtest.london.linode.com/100MB-london.bin
+
+    bench_dl "Leaseweb - Haarlem NL" \
+        http://mirror.leaseweb.com/speedtest/100mb.bin
+
+    bench_dl "Softlayer - Singapore" \
+        http://speedtest.sng01.softlayer.com/downloads/test100.zip
+
+    bench_dl "Softlayer - Seattle WA" \
+        http://speedtest.sea01.softlayer.com/downloads/test100.zip
+
+    bench_dl "Softlayer - San Jose CA" \
+        http://speedtest.sjc01.softlayer.com/downloads/test100.zip
+
+    bench_dl "Softlwayer - Washing DC" \
+        http://speedtest.wdc01.softlayer.com/downloads/test100.zip
+}
+
+
+# Ensure unix bench is installed
+function ensure_unixbench {
+    [ -d UnixBench ] && return
+
+    local NAME=UnixBench5.1.3
+    wget http://byte-unixbench.googlecode.com/files/$NAME.tgz
+    tar xvfz $NAME.tgz
+}
+
+
+# Perform comprehensive benchmark of cpu and disk
+function bench_unixbench {
+    ensure_unixbench
+
+    ap-get install build-essential
+    #apt-get install build-essential libx11-dev libgl1-mesa-dev libxext-dev
+
+    # dont need graphics
+    pushd UnixBench > /dev/null
+    ./Run index
+    popd > /dev/null
+}
+
+
+# Display usage.
+function usage {
+    cat <<USAGE
+Usage: vpsbench [OPTION...]
+
+-a Bench all
+-d Bench downloads
+-u Bench unixbench
+
+USAGE
+}
+
+
+# The main script.
+function main {
+    bench_quick
+
+    test $do_downloads && bench_downloads
+    test $do_unixbench && bench_unixbench
+}
+
+
+# Parse command line options
+while getopts :adu opt; do
+    case "$opt" in
+        a)
+            do_downloads=true
+            do_unixbench=true
+            ;;
+
+        d)
+            do_downloads=true
+            ;;
+
+        u)
+            do_unixbench=true
+            ;;
+
+        ?)
+            usage
+            exit 2
+            ;;
+    esac
+done
+
+main
+
