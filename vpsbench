@@ -9,28 +9,37 @@
 
 # Quick benchmark, always run
 function bench_quick {
-    test_file=vpsbench__$$
-    cname=$( awk -F: '/model name/ {name=$2} END {print name}' /proc/cpuinfo )
-    cores=$( awk -F: '/model name/ {core++} END {print core}' /proc/cpuinfo )
-    freq=$( awk -F: ' /cpu MHz/ {freq=$2} END {print freq}' /proc/cpuinfo )
-    tram=$( free -m | awk 'NR==2 {print $2}' )
-    swap=$( free -m | awk 'NR==4 {print $2}' )
-    up=$(uptime|awk '{ $1=$2=$(NF-6)=$(NF-5)=$(NF-4)=$(NF-3)=$(NF-2)=$(NF-1)=$NF=""; print }')
+    local test_file=vpsbench__$$
+    local tar_file=tarfile
+    local now=$(date +"%m/%d/%Y")
 
-    echo -n Benching I/O speed ...
-    io=$( ( dd if=/dev/zero of=$test_file bs=64k count=16k conv=fdatasync && rm -f test_$$ ) 2>&1 | awk -F, '{io=$NF} END { print io}' )
-    rm $test_file
+    local cname=$( awk -F: '/model name/ {name=$2} END {print name}' /proc/cpuinfo )
+    local cores=$( awk -F: '/model name/ {core++} END {print core}' /proc/cpuinfo )
+    local freq=$( awk -F: ' /cpu MHz/ {freq=$2} END {print freq}' /proc/cpuinfo )
+    local tram=$( free -m | awk 'NR==2 {print $2}' )
+    local swap=$( free -m | awk 'NR==4 {print $2}' )
+    local up=$(uptime|awk '{ $1=$2=$(NF-6)=$(NF-5)=$(NF-4)=$(NF-3)=$(NF-2)=$(NF-1)=$NF=""; print }')
+
+    echo -n "Benching I/O ... "
+    local io=$( ( dd if=/dev/zero of=$test_file bs=64k count=16k conv=fdatasync && rm -f $test_file ) 2>&1 | awk -F, '{io=$NF} END { print io}' )
     echo OK
 
-    echo -n "Bzipping 25MB file ... "
-    local tar_file=tarfile
+    echo -n "Benching CPU. Bzipping 25MB file ... "
     dd if=/dev/urandom of=$tar_file bs=1024 count=25000 >>/dev/null 2>&1
-    tf=$( (/usr/bin/time -f "%es" tar cfj $tar_file.bz2 $tar_file) 2>&1 )
-    rm tarfile*
+    local tf=$( (/usr/bin/time -f "%es" tar cfj $tar_file.bz2 $tar_file) 2>&1 )
+    rm -f tarfile*
+    echo OK
+
+    echo -n "Benching inbound network. Downloading 100MB file ... "
+    local dl=$( _dl http://cachefly.cachefly.net/100mb.test )
     echo OK
 
     cat <<INFO
+Share at https://github.com/mgutz/vpsbench/wiki/VPS-Hosts
 
+
+_$now - VMPLAN - DATACENTER - OS - AUTHOR_
+\`\`\`
 CPU model: $cname
 Number of cores: $cores
 CPU frequency: $freq MHz
@@ -39,15 +48,23 @@ Total amount of swap: $swap MB
 System uptime: $up
 I/O speed: $io
 Bzip 25MB: $tf
+Download 100MB file: $dl
+\`\`\`
+
 
 INFO
+
+}
+
+function _dl {
+    wget -O /dev/null "$1" 2>&1 | awk '/\/dev\/null/ {speed=$3 $4} END {gsub(/\(|\)/,"",speed); print speed}'
 }
 
 
 # Bench a single download file.
 function bench_dl {
     echo -n "Downloading from $1 ... "
-    wget -O /dev/null "$2" 2>&1 | awk '/\/dev\/null/ {speed=$3 $4} END {gsub(/\(|\)/,"",speed); print speed}'
+    _dl "$2"
 }
 
 

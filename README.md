@@ -2,7 +2,13 @@
 
 Benchmark VPS performance.
 
-A script to run simple and comprehensive benchmarks on CPU and IO performance. Tested on:
+A script to run simple and comprehensive benchmarks on CPU and IO performance.
+The default benchmark performs:
+
+I/O
+
+
+Tested on:
 
 * Debian 6.0.6
 * Ubuntu 12.04 LTS
@@ -14,6 +20,8 @@ A script to run simple and comprehensive benchmarks on CPU and IO performance. T
 
     -a Bench all
     -d Bench downloads
+    -f Create 100M bigfile
+    -x Remove temporary files
     -u Bench unixbench
 
 
@@ -26,9 +34,10 @@ Example
     CPU frequency:  3417.879 MHz
     Total amount of RAM: 3265 MB
     Total amount of swap: 1021 MB
-    System uptime:   1:09,
-    I/O speed:  431 MB/s
-    Bzip 25MB: 4.73s
+    System uptime:   8:41,
+    I/O speed:  427 MB/s
+    Bzip 25MB: 4.66s
+    Download 100MB file: 1.64MB/s
 
 
 ## License
