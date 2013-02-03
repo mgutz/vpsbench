@@ -1,11 +1,8 @@
 # vpsbench
 
-Benchmark VPS performance.
+Benchmark VPS performance. See [user submissions](https://github.com/mgutz/vpsbench/wiki/VPS-Hosts)
 
 A script to run simple and comprehensive benchmarks on CPU and IO performance.
-The default benchmark performs:
-
-I/O
 
 
 Tested on:
