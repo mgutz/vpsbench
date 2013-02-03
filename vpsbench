@@ -9,9 +9,6 @@
 
 # Quick benchmark, always run
 function bench_quick {
-    # remove any left over test files
-    rm -f vpsbench__* > /dev/null
-
     test_file=vpsbench__$$
     cname=$( awk -F: '/model name/ {name=$2} END {print name}' /proc/cpuinfo )
     cores=$( awk -F: '/model name/ {core++} END {print core}' /proc/cpuinfo )
@@ -19,10 +16,21 @@ function bench_quick {
     tram=$( free -m | awk 'NR==2 {print $2}' )
     swap=$( free -m | awk 'NR==4 {print $2}' )
     up=$(uptime|awk '{ $1=$2=$(NF-6)=$(NF-5)=$(NF-4)=$(NF-3)=$(NF-2)=$(NF-1)=$NF=""; print }')
+
+    echo -n Benching I/O speed ...
     io=$( ( dd if=/dev/zero of=$test_file bs=64k count=16k conv=fdatasync && rm -f test_$$ ) 2>&1 | awk -F, '{io=$NF} END { print io}' )
     rm $test_file
+    echo OK
+
+    echo -n "Bzipping 25MB file ... "
+    local tar_file=tarfile
+    dd if=/dev/urandom of=$tar_file bs=1024 count=25000 >>/dev/null 2>&1
+    tf=$( (/usr/bin/time -f "%es" tar cfj $tar_file.bz2 $tar_file) 2>&1 )
+    rm tarfile*
+    echo OK
 
     cat <<INFO
+
 CPU model: $cname
 Number of cores: $cores
 CPU frequency: $freq MHz
@@ -30,6 +38,8 @@ Total amount of RAM: $tram MB
 Total amount of swap: $swap MB
 System uptime: $up
 I/O speed: $io
+Bzip 25MB: $tf
+
 INFO
 }
 
@@ -72,21 +82,21 @@ function bench_downloads {
     bench_dl "Softlayer - San Jose CA" \
         http://speedtest.sjc01.softlayer.com/downloads/test100.zip
 
-    bench_dl "Softlwayer - Washington DC" \
+    bench_dl "Softlayer - Washington DC" \
         http://speedtest.wdc01.softlayer.com/downloads/test100.zip
 }
 
 
-# Ensure unix bench is installed
+# Ensure unix bench is installed (must be root)
 function ensure_unixbench {
-    [ -d UnixBench ] && return
+    test -d UnixBench && return
 
     apt-get install build-essential
     #apt-get install build-essential libx11-dev libgl1-mesa-dev libxext-dev
 
-    local filever=UnixBench5.1.3
-    wget http://byte-unixbench.googlecode.com/files/$filever.tgz
-    tar xvfz $filever.tgz
+    local file_ver=UnixBench5.1.3
+    wget -N http://byte-unixbench.googlecode.com/files/$file_ver.tgz
+    tar xvfz $file_ver.tgz
 }
 
 
@@ -109,11 +119,13 @@ function create_big_file {
 }
 
 
+# Remove temporary files and directories used/created during benchmarking.
 function remove_temporary_files {
     echo -n Removing temporary files ...
     rm -f vpsbench__*
     rm -f bigfile
     rm -rf UnixBench*
+    rm -rf tarfile*
     echo OK
 }
 
@@ -141,8 +153,6 @@ function main {
 }
 
 
-
-
 # Parse command line options
 while getopts :adfxu opt; do
     case "$opt" in
@@ -150,11 +160,9 @@ while getopts :adfxu opt; do
             do_downloads=true
             do_unixbench=true
             ;;
-
         d)
             do_downloads=true
             ;;
-
         f)
             create_big_file
             exit

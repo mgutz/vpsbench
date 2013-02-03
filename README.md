@@ -21,13 +21,14 @@ Example
 
     $ bash <(wget -O - https://raw.github.com/mgutz/vpsbench/master/vpsbench)
 
-    CPU model :  Intel(R) Core(TM) i7-3770 CPU @ 3.40GHz
-    Number of cores : 4
-    CPU frequency :  3417.879 MHz
-    Total amount of ram : 3265 MB
-    Total amount of swap : 1021 MB
-    System uptime :   2:00,
-    I/O speed :  647 MB/s
+    CPU model:  Intel(R) Core(TM) i7-3770 CPU @ 3.40GHz
+    Number of cores: 4
+    CPU frequency:  3417.879 MHz
+    Total amount of RAM: 3265 MB
+    Total amount of swap: 1021 MB
+    System uptime:   1:09,
+    I/O speed:  431 MB/s
+    Bzip 25MB: 4.73s
 
 
 ## License
