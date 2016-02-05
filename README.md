@@ -7,8 +7,12 @@ A script to run simple and comprehensive benchmarks on CPU and IO performance.
 
 Tested on:
 
-* Debian 6.0.6
+* Debian 6
+* Debian 7
+* Debian 8
+* Ubuntu 10.04 LTS
 * Ubuntu 12.04 LTS
+* Ubuntu 14.04 LTS
 
 
 ## Usage
