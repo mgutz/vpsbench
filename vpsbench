@@ -17,7 +17,7 @@ function bench_quick {
     local cores=$( awk -F: '/model name/ {core++} END {print core}' /proc/cpuinfo )
     local freq=$( awk -F: ' /cpu MHz/ {freq=$2} END {print freq}' /proc/cpuinfo )
     local tram=$( free -m | awk 'NR==2 {print $2}' )
-    local swap=$( free -m | awk 'NR==4 {print $2}' )
+    local swap=$( free -m | awk 'tolower($0) ~ /swap/ {print $2}' )
     local up=$(uptime|awk '{ $1=$2=$(NF-6)=$(NF-5)=$(NF-4)=$(NF-3)=$(NF-2)=$(NF-1)=$NF=""; print }')
 
     echo -n "Benching I/O ... "
