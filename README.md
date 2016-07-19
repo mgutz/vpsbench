@@ -13,6 +13,7 @@ Tested on:
 * Ubuntu 10.04 LTS
 * Ubuntu 12.04 LTS
 * Ubuntu 14.04 LTS
+* Ubuntu 16.04 LTS
 
 
 ## Usage
@@ -33,7 +34,7 @@ Debian pre-requisites
 Example
 
 
-    $ bash <(wget --no-check-certificate -O - https://raw.github.com/mgutz/vpsbench/master/vpsbench)
+    $ curl -#L git.io/vpsbench | bash
 
     CPU model:  Intel(R) Core(TM) i7-3770 CPU @ 3.40GHz
     Number of cores: 4
