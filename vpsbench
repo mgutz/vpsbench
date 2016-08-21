@@ -76,13 +76,13 @@ function bench_downloads {
         http://cachefly.cachefly.net/100mb.test
 
     bench_dl "Linode - Atlanta GA" \
-        http://atlanta1.linode.com/100MB-atlanta.bin
+        http://speedtest.atlanta.linode.com/100MB-atlanta.bin
 
     bench_dl "Linode - Dallas TX" \
-        http://dallas1.linode.com/100MB-dallas.bin
+        http://speedtest.dallas.linode.com/100MB-dallas.bin
 
     bench_dl "Linode - Tokyo JP" \
-        http://tokyo1.linode.com/100MB-tokyo.bin
+        http://speedtest.tokyo.linode.com/100MB-tokyo.bin
 
     bench_dl "Linode - London UK" \
         http://speedtest.london.linode.com/100MB-london.bin
