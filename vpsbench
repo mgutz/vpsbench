@@ -111,8 +111,8 @@ function ensure_unixbench {
     apt-get install build-essential
     #apt-get install build-essential libx11-dev libgl1-mesa-dev libxext-dev
 
-    local file_ver=UnixBench5.1.3
-    wget -N http://byte-unixbench.googlecode.com/files/$file_ver.tgz
+    local file_ver=v5.1.3
+    wget -N https://github.com/kdlucas/byte-unixbench/archive/$file_ver.tar.gz
     tar xvfz $file_ver.tgz
 }
 
