@@ -10,6 +10,7 @@ Tested on:
 * Debian 6
 * Debian 7
 * Debian 8
+* CentOS 7
 * Ubuntu 10.04 LTS
 * Ubuntu 12.04 LTS
 * Ubuntu 14.04 LTS
