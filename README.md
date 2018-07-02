@@ -27,7 +27,11 @@ Tested on:
 
 Debian pre-requisites
 
-    apt-get install time bzip2
+    apt-get install time bzip2 -y
+    
+CentOS/RHEL pre-requisites
+
+    yum install time bzip2 -y
 
 
 Example
