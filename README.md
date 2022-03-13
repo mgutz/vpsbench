@@ -10,9 +10,15 @@ Tested on:
 * Debian 6
 * Debian 7
 * Debian 8
+* Debian 9
+* Debian 10
+* Debian 11
 * Ubuntu 10.04 LTS
 * Ubuntu 12.04 LTS
 * Ubuntu 14.04 LTS
+* Ubuntu 16.04 LTS
+* Ubuntu 18.04 LTS
+* Ubuntu 20.04 LTS
 
 
 ## Usage
