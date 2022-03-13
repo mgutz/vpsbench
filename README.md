@@ -27,7 +27,7 @@ Tested on:
 
 Debian pre-requisites
 
-    apt-get install time bzip2 free uptime procps
+    apt-get install time bzip2 procps wget 
 
 
 Example
